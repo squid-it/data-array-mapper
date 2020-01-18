@@ -1,0 +1,10 @@
+### PHP STORM
+.idea/
+
+### Project
+.env
+.phpunit*
+/vendor/
+/composer.lock
+/coverage*
+/phpunit.xml
