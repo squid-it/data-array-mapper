@@ -102,7 +102,7 @@ To get our end result we need to do this
 <?php
 
 // Make sure composer autoload has loaded
-use Squid\Data\ResultSetToArray\Mapper;
+use SquidIT\Data\ResultSetToArray\Mapper;
 
 $parsedStructure = Mapper::parseStructure($resultStructure, $pivotPoints);
 $mapData         = Mapper::mapData($resultSet, $parsedStructure);
