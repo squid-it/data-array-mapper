@@ -76,7 +76,10 @@ class Mapper
 				$path[$depth] = '['.$pivotPoints['[root]'].']';
 			}
 
-			if (!is_int($key)) {
+			$keyType = gettype($key);
+			$structureType = gettype($structure);
+
+			if ($keyType === 'string' && $structureType === 'array') {
 				$cleanPath[$depth]	= $key;
 				$point				= implode(self::$sep, $cleanPath);
 
@@ -87,10 +90,8 @@ class Mapper
 				}
 			}
 
-			if (!is_array($structure)) {
-				// $structure can be in the format of 'tableName.column'
-				$structureArray = explode(self::$sep, $structure);
-				$structureName = array_pop($structureArray);
+			if ($structureType !== 'array') {
+				$structureName = ($keyType === 'integer') ? $structure : $key;
 
 				$flatArray[$structureName] = implode(
 					self::$sep,

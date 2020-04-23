@@ -14,9 +14,14 @@ class MapperTest extends TestCase
 	private $exampleDataSet;
 
 	/**
-	 * @var array $resultStructure
+	 * @var array $resultStructureDbColumnToResult
 	 */
-	private $resultStructure;
+	private $resultStructureDbColumnToResult;
+
+	/**
+	 * @var array
+	 */
+	private $resultStructureDbColumnToNewColumnResult;
 
 	/**
 	 * @var array $pivotPoints
@@ -34,13 +39,29 @@ class MapperTest extends TestCase
 		$this->exampleDataSet = require __DIR__.DIRECTORY_SEPARATOR.'ResultSet'.DIRECTORY_SEPARATOR.'dataset.php';
 
 		// We want out resultSet to follow the below structure
-		$this->resultStructure = [
+		$this->resultStructureDbColumnToResult = [
 			'userId',
 			'userName',
 			'age',
 			'toys' => [
 				'toyId',
 				'toyType',
+				'toyName',
+				'placesToyVisited' => [
+					'placeId',
+					'placeName',
+				]
+			]
+		];
+
+		// We want out resultSet to follow the below structure
+		$this->resultStructureDbColumnToNewColumnResult = [
+			'userId',
+			'userName',
+			'age' => 'leeftijd',
+			'toys' => [
+				'toyId',
+				'toyType' => 'soort',
 				'toyName',
 				'placesToyVisited' => [
 					'placeId',
@@ -64,17 +85,26 @@ class MapperTest extends TestCase
 		unset($pivotPoints['[root]']);
 
 		$this->expectException(InvalidArgumentException::class);
-		Mapper::parseStructure($this->resultStructure, $pivotPoints);
+		Mapper::parseStructure($this->resultStructureDbColumnToResult, $pivotPoints);
 	}
 
-	public function testParseStructure(): void
+	public function testParseStructureColumnToResult(): void
 	{
 		$key = 'placeName';
 		$value = '[userId].toys.[toyId].placesToyVisited.[placeId].placeName';
 
-		$structure = Mapper::parseStructure($this->resultStructure, $this->pivotPoints);
+		$structure = Mapper::parseStructure($this->resultStructureDbColumnToResult, $this->pivotPoints);
 		$this->assertArrayHasKey('userName', $structure);
 		$this->assertArrayHasKey('placeId', $structure);
+		$this->assertEquals($value, $structure[$key]);
+	}
+
+	public function testParseStructureColumnToNewColumn(): void
+	{
+		$key = 'toyType';
+		$value = '[userId].toys.[toyId].soort';
+
+		$structure = Mapper::parseStructure($this->resultStructureDbColumnToNewColumnResult, $this->pivotPoints);
 		$this->assertEquals($value, $structure[$key]);
 	}
 
