@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace SquidIT\Data\ResultSetToArray;
 
+use InvalidArgumentException;
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
 
@@ -56,7 +57,7 @@ class Mapper
 	public static function parseStructure(array $resultStructure, array $pivotPoints): array
 	{
 		if (!isset($pivotPoints['[root]'])) {
-			throw new \InvalidArgumentException('Could not generate resultStructure no root pivot point supplied');
+			throw new InvalidArgumentException('Could not generate resultStructure no root pivot point supplied');
 		}
 
 		$path 		= [];
@@ -107,32 +108,66 @@ class Mapper
 		return $flatArray;
 	}
 
-	/**
-	 * mapData
-	 *
-	 * Generates the mapped result set
-	 *
-	 * @param array $dataSet the db result set
-	 * @param array $parsedStructure  array returned by self::parseStructure
-	 * @return array
-	 */
-	public static function mapData(array $dataSet, array $parsedStructure): array
+    /**
+     * mapData
+     *
+     * Generates the mapped result set
+     *
+     * @param array $dataSet the db result set
+     * @param array $parsedStructure array returned by self::parseStructure
+     * @param bool $usePivotPointIdAsKey set to false to not index the pivoted data with the pivot key value
+     * @return array
+     */
+	public static function mapData(array $dataSet, array $parsedStructure, bool $usePivotPointIdAsKey = true): array
 	{
-		$resultSet = [];
+        $resultSet = [];
 
-		if (empty($dataSet)) {
-			throw new \InvalidArgumentException('dataSet can not be empty');
-		}
+        if (empty($dataSet)) {
+            throw new InvalidArgumentException('dataSet can not be empty');
+        }
 
-		if (empty($parsedStructure)) {
-			throw new \InvalidArgumentException('parsedStructure can not be empty');
-		}
+        if (empty($parsedStructure)) {
+            throw new InvalidArgumentException('parsedStructure can not be empty');
+        }
+
+        $aPath = $parsedStructure[array_key_first($parsedStructure)];
+        $rootId = explode('.', $aPath, 2);
+
+        if (count($rootId) !== 2 || strpos($rootId[0], '[') !== 0 || $rootId[0][-1] !== ']') {
+            throw new InvalidArgumentException('Could not detect root element');
+        }
+
+        $requiredColumns = array_keys($parsedStructure);
+        $rootElement = substr($rootId[0], 1, -1);
+        $previousId = null;
+        $currentId = null;
+
+        if (!$usePivotPointIdAsKey) {
+            self::sortDataSet($dataSet, $rootElement);
+        }
 
 		foreach ($dataSet as $dataRecord) {
+		    $availableColumns = array_keys($dataRecord);
+		    if (!empty(array_diff($requiredColumns, $availableColumns))) {
+                throw new InvalidArgumentException('Invalid data set supplied, not all required columns are present');
+            }
+
+            $currentId = $dataRecord[$rootElement];
+		    if (!$usePivotPointIdAsKey && $previousId !== null && $currentId !== $previousId) {
+                self::removePivotKeyValues($resultSet[$previousId]);
+            }
+
 			foreach ($parsedStructure as $columnName => $path) {
 				self::setValue($resultSet, $path, $columnName, $dataRecord);
 			}
+
+			$previousId = $currentId;
 		}
+
+		if (!$usePivotPointIdAsKey) {
+            self::removePivotKeyValues($resultSet[$previousId]);
+            $resultSet = array_values($resultSet);
+        }
 
 		return $resultSet;
 	}
@@ -185,4 +220,71 @@ class Mapper
 		// we are at the end of our array, set value
 		$resultSet = $record[$columnName];
 	}
+
+    /**
+     * removePivotKeyValues
+     *
+     * removes pivot point identifier values from the result set.
+     * when converting array to json object this prevents arrays from being transformed to objects.
+     *
+     * $mappedArray = [
+     *    3 => [
+     *        'toys' => [
+     *            187 => [
+     *                'toyName' => 'car'
+     *            ]
+     *        ]
+     * ]
+     *
+     * becomes:
+     * $mappedArray = [
+     *    0 => [
+     *        'toys' => [
+     *            0 => [
+     *                'toyName' => 'car'
+     *            ]
+     *        ]
+     * ]
+     * @param array $mappedData
+     */
+    protected static function removePivotKeyValues(array &$mappedData): void
+    {
+        // a pivot point will always be on an even level
+        $pivotPointLevel = 2;
+
+        $mappedDataIterator = new RecursiveArrayIterator($mappedData);
+        $recursiveIterator  = new RecursiveIteratorIterator(
+            $mappedDataIterator,
+            RecursiveIteratorIterator::SELF_FIRST
+        );
+
+        foreach ($recursiveIterator as $key => $data) {
+            $depth = $recursiveIterator->getDepth();
+
+            if (!is_array($data) || ($depth % $pivotPointLevel) !== 0) {
+                continue;
+            }
+
+            $data = array_values($data);
+
+            // replace data on required array level and walk up the three replacing data with a copy of the changed array
+            for ($subDepth = $depth; $subDepth >= 0; $subDepth--) {
+
+                $subIterator = $recursiveIterator->getSubIterator($subDepth);
+                // Set new value on required level, or set value of changed array
+                $subIterator->offsetSet(
+                    $subIterator->key(),
+                    ($subDepth === $depth ? $data : $recursiveIterator->getSubIterator(($subDepth+1))->getArrayCopy())
+                );
+            }
+        }
+
+        $mappedData = $recursiveIterator->getArrayCopy();
+    }
+
+    protected static function sortDataSet(array &$dataset, string $rootElement): void
+    {
+        $arrayColumn = array_column($dataset, $rootElement);
+        array_multisort($arrayColumn, SORT_ASC, $dataset);
+    }
 }
