@@ -60,12 +60,12 @@ class Mapper
             throw new InvalidArgumentException('Could not generate resultStructure no root pivot point supplied');
         }
 
-        $path 		= [];
-        $cleanPath	= [];
-        $flatArray	= [];
+        $path       = [];
+        $cleanPath  = [];
+        $flatArray  = [];
 
-        $resultStructureIterator	= new RecursiveArrayIterator($resultStructure);
-        $recursiveIterator			= new RecursiveIteratorIterator(
+        $resultStructureIterator = new RecursiveArrayIterator($resultStructure);
+        $recursiveIterator = new RecursiveIteratorIterator(
             $resultStructureIterator,
             RecursiveIteratorIterator::SELF_FIRST
         );
@@ -81,8 +81,8 @@ class Mapper
             $structureType = gettype($structure);
 
             if ($keyType === 'string' && $structureType === 'array') {
-                $cleanPath[$depth]	= $key;
-                $point				= implode(self::$sep, $cleanPath);
+                $cleanPath[$depth] = $key;
+                $point = implode(self::$sep, $cleanPath);
 
                 if ($depth === 0) {
                     $path[$depth] = '['.$pivotPoints['[root]'].']'.self::$sep.$key.'.['.$pivotPoints[$point].']';
