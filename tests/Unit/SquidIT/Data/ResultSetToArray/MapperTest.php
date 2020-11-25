@@ -128,8 +128,8 @@ class MapperTest extends TestCase
     public function testMapData(): void
     {
         $structure = [
-            'userId'	=> '[userId].userId',
-            'placeId'	=> '[userId].toys.[toyId].placesToyVisited.[placeId].placeId',
+            'userId'  => '[userId].userId',
+            'placeId' => '[userId].toys.[toyId].placesToyVisited.[placeId].placeId',
         ];
 
         $resultSet = Mapper::mapData($this->exampleDataSet, $structure);
@@ -142,8 +142,8 @@ class MapperTest extends TestCase
     public function testMapDataNoPivotKeyIdValue(): void
     {
         $structure = [
-            'userId'	=> '[userId].userId',
-            'placeId'	=> '[userId].toys.[toyId].placesToyVisited.[placeId].placeId',
+            'userId'  => '[userId].userId',
+            'placeId' => '[userId].toys.[toyId].placesToyVisited.[placeId].placeId',
         ];
 
         $resultSet = Mapper::mapData($this->exampleDataSet, $structure, false);
@@ -156,8 +156,8 @@ class MapperTest extends TestCase
     public function testMapDataUnorderedDataSet(): void
     {
         $structure = [
-            'userId'	=> '[userId].userId',
-            'placeId'	=> '[userId].toys.[toyId].placesToyVisited.[placeId].placeId',
+            'userId'  => '[userId].userId',
+            'placeId' => '[userId].toys.[toyId].placesToyVisited.[placeId].placeId',
         ];
 
         $resultSet = Mapper::mapData($this->exampleDataSetUnordered, $structure);
@@ -170,9 +170,7 @@ class MapperTest extends TestCase
     public function testMapDataUnorderedDataSetNoPivotKeyIdValue(): void
     {
         $structure = Mapper::parseStructure($this->resultStructureDbColumnToResult, $this->pivotPoints);
-
         $resultSet = Mapper::mapData($this->exampleDataSetUnordered, $structure, false);
-        //var_export($resultSet);
         $firstRecord = reset($resultSet);
 
         $this->assertArrayHasKey(0, $firstRecord['toys']);
@@ -189,8 +187,8 @@ class MapperTest extends TestCase
     public function testMapDataEmptyDataSet(): void
     {
         $structure = [
-            'userId'	=> '[userId].userId',
-            'placeId'	=> '[userId].toys.[toyId].placesToyVisited.[placeId].placeId',
+            'userId'  => '[userId].userId',
+            'placeId' => '[userId].toys.[toyId].placesToyVisited.[placeId].placeId',
         ];
 
         $this->expectException(InvalidArgumentException::class);
