@@ -76,24 +76,24 @@ In the below $resultStructure array we got 3 pivot points.
 <?php
 
 $resultStructure = [
-	'userId',
-	'userName',
-	'age',
-	'toys' => [
-		'toyId',
-		'toyType',
-		'toyName',
-		'placesToyVisited' => [
-			'placeId',
-			'placeName',
-		]
-	]
+    'userId',
+    'userName',
+    'age',
+    'toys' => [
+        'toyId',
+        'toyType',
+        'toyName',
+        'placesToyVisited' => [
+            'placeId',
+            'placeName',
+        ]
+    ]
 ];
 
 $pivotPoints = [
-	'[root]' => 'userId',
-	'toys' => 'toyId',
-	'toys.placesToyVisited' => 'placeId',
+    '[root]' => 'userId',
+    'toys' => 'toyId',
+    'toys.placesToyVisited' => 'placeId',
 ];
 ```
 
@@ -130,23 +130,23 @@ the new column.
 <?php
 
 $resultStructure = [
-	'userId' => 'accountId', // dataset column = 'userId', output would be 'accountId'
-	'userName' => 'accountName',
-	'age' => 'accountCreationDate',
-	'toys' => [
-		'toyId',
-		'toyType' => 'specimen',
-		'toyName',
-		'placesToyVisited' => [
-			'placeId',
-			'placeName',
-		]
-	]
+    'userId' => 'accountId', // dataset column = 'userId', output would be 'accountId'
+    'userName' => 'accountName',
+    'age' => 'accountCreationDate',
+    'toys' => [
+        'toyId',
+        'toyType' => 'specimen',
+        'toyName',
+        'placesToyVisited' => [
+            'placeId',
+            'placeName',
+        ]
+    ]
 ];
 
 $pivotPoints = [
-	'[root]' => 'userId',
-	'toys' => 'toyId',
-	'toys.placesToyVisited' => 'placeId',
+    '[root]' => 'userId',
+    'toys' => 'toyId',
+    'toys.placesToyVisited' => 'placeId',
 ];
 ```
