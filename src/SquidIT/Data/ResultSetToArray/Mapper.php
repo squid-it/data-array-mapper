@@ -30,24 +30,24 @@ class Mapper
      *
      * example input structure:
      * $resultStructure = [
-     * 	'userId',
-     * 	'userName',
-     * 	'age',
-     * 	'toys' => [
-     * 		'toyId',
-     * 		'toyType',
-     * 		'toyName',
-     * 		'placesToyVisited' => [
-     * 			'placeId',
-     * 			'placeName',
-     * 		]
-     * 	]
+     *  'userId',
+     *  'userName',
+     *  'age',
+     *  'toys' => [
+     *      'toyId',
+     *      'toyType',
+     *      'toyName',
+     *      'placesToyVisited' => [
+     *          'placeId',
+     *          'placeName',
+     *      ]
+     *  ]
      * ];
      *
      * $pivotPoints = [
-     * 	'[root]' => 'userId',
-     * 	'toys' => 'toyId',
-     * 	'toys.placesToyVisited' => 'placeId',
+     *  '[root]' => 'userId',
+     *  'toys' => 'toyId',
+     *  'toys.placesToyVisited' => 'placeId',
      * ];
      *
      * @param array $resultStructure describes how our end result needs to look
@@ -183,12 +183,12 @@ class Mapper
      * example: $columnName = 'toyName'
      *
      * $resultSet = [
-     * 	3 => [
-     * 		'toys' => [
-     * 			187 => [
-     * 				'toyName' => 'car'
-     * 			]
-     * 		]
+     *  3 => [
+     *      'toys' => [
+     *          187 => [
+     *              'toyName' => 'car'
+     *          ]
+     *      ]
      * ]
      *
      * @param array $resultSet the array that will hold the end result
