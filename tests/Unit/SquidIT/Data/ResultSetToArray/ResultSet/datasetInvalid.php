@@ -45,7 +45,6 @@ return [
     [
         'userId'    => 3,
         'userName'  => 'MoròSwitie',
-        'age'       => 37,
         'toyId'     => 14,
         'toyType'   => 'car',
         'toyName'   => 'squidily',
@@ -65,12 +64,10 @@ return [
         'placeName' => null,
     ],
     [
-        'userId'    => 66,
         'userName'  => 'Angie',
         'age'       => 32,
         'toyId'     => 115,
         'toyType'   => 'guitar',
-        'toyName'   => 'Lucy',
         'placeId'   => 35,
         'placeName' => 'Japan',
     ],

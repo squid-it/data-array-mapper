@@ -2,7 +2,7 @@
 Convert a database result set to a multidimensional array
 
 This package allows you to quickly convert a database result set into a multidimensional array.
-This is useful when you need to output nested json for example
+This is useful when you need to output nested json for example.
 
 ### Example data set & and result
 ```php
@@ -76,24 +76,24 @@ In the below $resultStructure array we got 3 pivot points.
 <?php
 
 $resultStructure = [
-	'userId',
-	'userName',
-	'age',
-	'toys' => [
-		'toyId',
-		'toyType',
-		'toyName',
-		'placesToyVisited' => [
-			'placeId',
-			'placeName',
-		]
-	]
+    'userId',
+    'userName',
+    'age',
+    'toys' => [
+        'toyId',
+        'toyType',
+        'toyName',
+        'placesToyVisited' => [
+            'placeId',
+            'placeName',
+        ]
+    ]
 ];
 
 $pivotPoints = [
-	'[root]' => 'userId',
-	'toys' => 'toyId',
-	'toys.placesToyVisited' => 'placeId',
+    '[root]' => 'userId',
+    'toys' => 'toyId',
+    'toys.placesToyVisited' => 'placeId',
 ];
 ```
 
@@ -108,31 +108,45 @@ $parsedStructure = Mapper::parseStructure($resultStructure, $pivotPoints);
 $mappedData      = Mapper::mapData($resultSet, $parsedStructure);
 ```
 
+If we do not want to have our pivoted data to be prefixed by the pivot point id value, we can add an extra parameter
+"false" to the `Mapper::mapData` method.
+
+This will ensure that when using json_encode the resulting object will contain arrays for all pivoted data.
+```php
+<?php
+
+// Make sure composer autoload has loaded
+use SquidIT\Data\ResultSetToArray\Mapper;
+
+$parsedStructure = Mapper::parseStructure($resultStructure, $pivotPoints);
+$mappedData      = Mapper::mapData($resultSet, $parsedStructure, false);
+```
+
 ##### Specifying a different column name:
 It is possible to use a different column name in our mapped data result. To do this we can specify how we want to name
-new column.
+the new column.
 
 ```php
 <?php
 
 $resultStructure = [
-	'userId' => 'accountId', // dataset column = 'userId', output would be 'accountId'
-	'userName' => 'accountName',
-	'age' => 'accountCreationDate',
-	'toys' => [
-		'toyId',
-		'toyType' => 'specimen',
-		'toyName',
-		'placesToyVisited' => [
-			'placeId',
-			'placeName',
-		]
-	]
+    'userId' => 'accountId', // dataset column = 'userId', output would be 'accountId'
+    'userName' => 'accountName',
+    'age' => 'accountCreationDate',
+    'toys' => [
+        'toyId',
+        'toyType' => 'specimen',
+        'toyName',
+        'placesToyVisited' => [
+            'placeId',
+            'placeName',
+        ]
+    ]
 ];
 
 $pivotPoints = [
-	'[root]' => 'userId',
-	'toys' => 'toyId',
-	'toys.placesToyVisited' => 'placeId',
+    '[root]' => 'userId',
+    'toys' => 'toyId',
+    'toys.placesToyVisited' => 'placeId',
 ];
 ```

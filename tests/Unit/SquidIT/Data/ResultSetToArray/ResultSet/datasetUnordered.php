@@ -13,6 +13,16 @@ return [
         'placeName' => 'Australia',
     ],
     [
+        'userId'    => 66,
+        'userName'  => 'Angie',
+        'age'       => 32,
+        'toyId'     => 114,
+        'toyType'   => 'guitar',
+        'toyName'   => 'Lucille',
+        'placeId'   => null,
+        'placeName' => null,
+    ],
+    [
         'userId'    => 3,
         'userName'  => 'MoròSwitie',
         'age'       => 37,
@@ -33,6 +43,16 @@ return [
         'placeName' => 'Australia',
     ],
     [
+        'userId'    => 66,
+        'userName'  => 'Angie',
+        'age'       => 32,
+        'toyId'     => 333,
+        'toyType'   => 'bottle',
+        'toyName'   => 'Drink Bottle',
+        'placeId'   => 35,
+        'placeName' => 'Japan',
+    ],
+    [
         'userId'    => 3,
         'userName'  => 'MoròSwitie',
         'age'       => 37,
@@ -51,18 +71,6 @@ return [
         'toyName'   => 'squidily',
         'placeId'   => 35,
         'placeName' => 'Japan',
-    ],
-
-    // User Angie
-    [
-        'userId'    => 66,
-        'userName'  => 'Angie',
-        'age'       => 32,
-        'toyId'     => 114,
-        'toyType'   => 'guitar',
-        'toyName'   => 'Lucille',
-        'placeId'   => null,
-        'placeName' => null,
     ],
     [
         'userId'    => 66,
