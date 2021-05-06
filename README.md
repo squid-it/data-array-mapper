@@ -4,7 +4,7 @@ Convert a database result set to a multidimensional array
 This package allows you to quickly convert a database result set into a multidimensional array.
 This is useful when you need to output nested json for example.
 
-### Example data set & and result
+### Example data set & end result
 ```php
 <?php
 

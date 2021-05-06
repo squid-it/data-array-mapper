@@ -148,8 +148,11 @@ class Mapper
 
         foreach ($dataSet as $dataRecord) {
             $availableColumns = array_keys($dataRecord);
-            if (!empty(array_diff($requiredColumns, $availableColumns))) {
-                throw new InvalidArgumentException('Invalid data set supplied, not all required columns are present');
+            if (!empty(($difference = array_diff($requiredColumns, $availableColumns)))) {
+                throw new InvalidArgumentException(
+                    'Invalid data set supplied, not all required columns are present, missing: "'
+                    . implode('", "', $difference) . '"'
+                );
             }
 
             $currentId = $dataRecord[$rootElement];
