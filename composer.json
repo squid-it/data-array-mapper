@@ -1,7 +1,7 @@
 {
   "description": "Squid IT - Database ResultSet to Multidimensional Array Mapper",
   "name": "squidit/data-array-mapper",
-  "keywords": ["resultset", "multidimensional", "array", "mapper"],
+  "keywords": ["resultset", "multidimensional", "array", "mapper", "result set", "convert"],
   "type": "library",
   "license": "MIT",
   "authors": [
@@ -10,11 +10,8 @@
       "email": "developer@squidit.nl"
     }
   ],
-  "require": {
-    "php": "^7.3 || ^8.0"
-  },
-  "require-dev": {
-    "phpunit/phpunit": "^8"
+  "config": {
+    "sort-packages": true
   },
   "autoload": {
     "psr-4": {
@@ -26,10 +23,28 @@
       "Tests\\Unit\\SquidIT\\Data\\ResultSetToArray\\": "tests/Unit/SquidIT/Data/ResultSetToArray"
     }
   },
-  "scripts": {
-    "test": "phpunit"
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/squid-it/php-coding-standards.git"
+    }
+  ],
+  "require": {
+    "php": "^8.2"
   },
-  "config": {
-    "sort-packages": true
+  "require-dev": {
+    "squidit/php-coding-standards": "^2.0",
+    "friendsofphp/php-cs-fixer": "^3.57",
+    "phpstan/phpstan": "^2.0",
+    "phpunit/phpunit": "^11.1"
+  },
+  "scripts": {
+    "check": "phpstan analyse -l 8 src tests",
+    "test": "phpunit --testsuite unit",
+    "test:coverage": [
+      "@putenv XDEBUG_MODE=coverage",
+      "phpunit --testsuite unit --coverage-text"
+    ],
+    "fix": "php-cs-fixer fix && phpstan analyse -l 8 src tests"
   }
 }

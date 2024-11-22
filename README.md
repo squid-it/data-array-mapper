@@ -123,7 +123,7 @@ $mappedData      = Mapper::mapData($resultSet, $parsedStructure, false);
 ```
 
 ##### Specifying a different column name:
-It is possible to use a different column name in our mapped data result. To do this we can specify how we want to name
+It is possible to use a different column name in our mapped data result. To do this, we can specify how we want to name
 the new column.
 
 ```php
