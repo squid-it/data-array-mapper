@@ -1,9 +1,5 @@
 <?php
-/**
- * @package ResultSetToArray
- * @author Cecil Zorg <developer@squidit.nl>
- * @version 0.2.1 2020-11-25
- */
+
 declare(strict_types=1);
 
 namespace SquidIT\Data\ResultSetToArray;
@@ -12,23 +8,20 @@ use InvalidArgumentException;
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
 
-/**
- * Class Mapper
- * @package SquidIT\Data\ResultSetToArray
- */
 class Mapper
 {
-    /**
-     * @var string $sep the separator used
-     */
-    public static $sep = '.';
+    /** @var non-empty-string the separator used */
+    public static string $sep = '.';
+
+    /** @var int a pivot point will always be on an even level */
+    private static int $pivotPointLevel = 2;
 
     /**
      * parseStructure
      *
-     * Generates a structure with columnNames and the path in . dot notation
+     * Generates a structure with columnNames and the path in "." Dot notation
      *
-     * example input structure:
+     * Example input structure:
      * $resultStructure = [
      *  'userId',
      *  'userName',
@@ -50,9 +43,10 @@ class Mapper
      *  'toys.placesToyVisited' => 'placeId',
      * ];
      *
-     * @param array $resultStructure describes how our end result needs to look
-     * @param array $pivotPoints
-     * @return array
+     * @param array<int|string, array<mixed>|string> $resultStructure describes how our end-result needs to look
+     * @param array<string, string>                  $pivotPoints
+     *
+     * @return array<string, string>
      */
     public static function parseStructure(array $resultStructure, array $pivotPoints): array
     {
@@ -60,12 +54,12 @@ class Mapper
             throw new InvalidArgumentException('Could not generate resultStructure no root pivot point supplied');
         }
 
-        $path       = [];
-        $cleanPath  = [];
-        $flatArray  = [];
+        $path      = [];
+        $cleanPath = [];
+        $flatArray = [];
 
         $resultStructureIterator = new RecursiveArrayIterator($resultStructure);
-        $recursiveIterator = new RecursiveIteratorIterator(
+        $recursiveIterator       = new RecursiveIteratorIterator(
             $resultStructureIterator,
             RecursiveIteratorIterator::SELF_FIRST
         );
@@ -74,24 +68,25 @@ class Mapper
             $depth = $recursiveIterator->getDepth();
 
             if ($depth === 0) {
-                $path[$depth] = '['.$pivotPoints['[root]'].']';
+                $path[$depth] = '[' . $pivotPoints['[root]'] . ']';
             }
 
-            $keyType = gettype($key);
+            $keyType       = gettype($key);
             $structureType = gettype($structure);
 
             if ($keyType === 'string' && $structureType === 'array') {
                 $cleanPath[$depth] = $key;
-                $point = implode(self::$sep, $cleanPath);
+                $point             = implode(self::$sep, $cleanPath);
 
                 if ($depth === 0) {
-                    $path[$depth] = '['.$pivotPoints['[root]'].']'.self::$sep.$key.'.['.$pivotPoints[$point].']';
+                    $path[$depth] = '[' . $pivotPoints['[root]'] . ']' . self::$sep . $key . '.[' . $pivotPoints[$point] . ']';
                 } else {
-                    $path[$depth] = $key.'.['.$pivotPoints[$point].']';
+                    $path[$depth] = $key . '.[' . $pivotPoints[$point] . ']';
                 }
             }
 
             if ($structureType !== 'array') {
+                /** @var string $structureName */
                 $structureName = ($keyType === 'integer') ? $structure : $key;
 
                 $flatArray[$structureName] = implode(
@@ -101,7 +96,7 @@ class Mapper
                         0,
                         $recursiveIterator->getDepth() + 1
                     )
-                ).self::$sep.$structure;
+                ) . self::$sep . $structure;
             }
         }
 
@@ -113,10 +108,11 @@ class Mapper
      *
      * Generates the mapped result set
      *
-     * @param array $dataSet the db result set
-     * @param array $parsedStructure array returned by self::parseStructure
-     * @param bool $usePivotPointIdAsKey set to false to not index the pivoted data with the pivot key value
-     * @return array
+     * @param array<int, array<string, bool|int|string|null>> $dataSet              the db result set
+     * @param array<string, string>                           $parsedStructure      array returned by self::parseStructure
+     * @param bool                                            $usePivotPointIdAsKey if set to false, the pivoted data will not return the pivot point key id
+     *
+     * @return array<int|string, array<mixed>>
      */
     public static function mapData(array $dataSet, array $parsedStructure, bool $usePivotPointIdAsKey = true): array
     {
@@ -130,17 +126,20 @@ class Mapper
             throw new InvalidArgumentException('parsedStructure can not be empty');
         }
 
-        $aPath = $parsedStructure[array_key_first($parsedStructure)];
+        $aPath  = $parsedStructure[array_key_first($parsedStructure)];
         $rootId = explode('.', $aPath, 2);
 
-        if (count($rootId) !== 2 || strpos($rootId[0], '[') !== 0 || $rootId[0][-1] !== ']') {
+        if (
+            count($rootId) !== 2
+            || str_starts_with($rootId[0], '[') === false
+            || str_ends_with($rootId[0], ']') === false
+        ) {
             throw new InvalidArgumentException('Could not detect root element');
         }
 
         $requiredColumns = array_keys($parsedStructure);
-        $rootElement = substr($rootId[0], 1, -1);
-        $previousId = null;
-        $currentId = null;
+        $rootElement     = substr($rootId[0], 1, -1);
+        $previousId      = null;
 
         if (!$usePivotPointIdAsKey) {
             self::sortDataSet($dataSet, $rootElement);
@@ -148,7 +147,8 @@ class Mapper
 
         foreach ($dataSet as $dataRecord) {
             $availableColumns = array_keys($dataRecord);
-            if (!empty(($difference = array_diff($requiredColumns, $availableColumns)))) {
+
+            if (!empty($difference = array_diff($requiredColumns, $availableColumns))) {
                 throw new InvalidArgumentException(
                     'Invalid data set supplied, not all required columns are present, missing: "'
                     . implode('", "', $difference) . '"'
@@ -156,6 +156,7 @@ class Mapper
             }
 
             $currentId = $dataRecord[$rootElement];
+
             if (!$usePivotPointIdAsKey && $previousId !== null && $currentId !== $previousId) {
                 self::removePivotKeyValues($resultSet[$previousId]);
             }
@@ -194,10 +195,10 @@ class Mapper
      *      ]
      * ]
      *
-     * @param array $resultSet the array that will hold the end result
-     * @param string $path path to our value
-     * @param string $columnName columnName of the value to use
-     * @param array $record data record holding all column names as keys and there values
+     * @param array<int|string, array<mixed>>     $resultSet  the array that will hold the end result
+     * @param string                              $path       path to our value
+     * @param string                              $columnName columnName of the value to use
+     * @param array<string, bool|int|string|null> $record     data record key value pair
      */
     protected static function setValue(array &$resultSet, string $path, string $columnName, array $record): void
     {
@@ -216,11 +217,12 @@ class Mapper
                 }
             }
 
-            // create reference to positions in our array
+            // create a reference to position in our array
             $resultSet = &$resultSet[$key];
         }
 
         // we are at the end of our array, set value
+        /** @phpstan-ignore parameterByRef.type */
         $resultSet = $record[$columnName];
     }
 
@@ -248,15 +250,14 @@ class Mapper
      *            ]
      *        ]
      * ]
-     * @param array $mappedData
+     *
+     * @param array<int, array<mixed>> $mappedData
      */
     protected static function removePivotKeyValues(array &$mappedData): void
     {
-        // a pivot point will always be on an even level
-        $pivotPointLevel = 2;
-
         $mappedDataIterator = new RecursiveArrayIterator($mappedData);
-        $recursiveIterator  = new RecursiveIteratorIterator(
+        /** @var RecursiveIteratorIterator<RecursiveArrayIterator<int, array<mixed>>> $recursiveIterator */
+        $recursiveIterator = new RecursiveIteratorIterator(
             $mappedDataIterator,
             RecursiveIteratorIterator::SELF_FIRST
         );
@@ -264,7 +265,7 @@ class Mapper
         foreach ($recursiveIterator as $key => $data) {
             $depth = $recursiveIterator->getDepth();
 
-            if (!is_array($data) || ($depth % $pivotPointLevel) !== 0) {
+            if (is_array($data) === false || ($depth % self::$pivotPointLevel) !== 0) {
                 continue;
             }
 
@@ -272,12 +273,15 @@ class Mapper
 
             // replace data on required array level and walk up the three replacing data with a copy of the changed array
             for ($subDepth = $depth; $subDepth >= 0; $subDepth--) {
-
+                /** @var RecursiveArrayIterator<int, array<mixed>> $subIterator */
                 $subIterator = $recursiveIterator->getSubIterator($subDepth);
-                // Set new value on required level, or set value of changed array
+
+                /** @var RecursiveArrayIterator<int, array<mixed>> $subIteratorNext */
+                $subIteratorNext = $recursiveIterator->getSubIterator($subDepth + 1);
+                // Set new value on required level, or replace value with modified array data
                 $subIterator->offsetSet(
                     $subIterator->key(),
-                    ($subDepth === $depth ? $data : $recursiveIterator->getSubIterator(($subDepth+1))->getArrayCopy())
+                    $subDepth === $depth ? $data : $subIteratorNext->getArrayCopy()
                 );
             }
         }
@@ -285,6 +289,9 @@ class Mapper
         $mappedData = $recursiveIterator->getArrayCopy();
     }
 
+    /**
+     * @param array<int, array<string, bool|int|string|null>> $dataset
+     */
     protected static function sortDataSet(array &$dataset, string $rootElement): void
     {
         $arrayColumn = array_column($dataset, $rootElement);

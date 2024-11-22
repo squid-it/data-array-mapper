@@ -1,10 +1,14 @@
 ### PHP STORM
 .idea/
 
-### Project
-.env
-.phpunit*
+### Project PHP
+/run/*
+/log/*
+!/log/README.md
+.php_cs.cache
+.php-cs-fixer.cache
 /vendor/
-/composer.lock
-/coverage*
 /phpunit.xml
+/.phpunit.result.cache
+php_errors.log
+.phpunit.cache
