@@ -2,7 +2,21 @@
 Convert a database result set to a multidimensional array
 
 This package allows you to quickly convert a database result set into a multidimensional array.
-This is useful when you need to output nested json for example.
+This is useful when you need to output nested JSON for example.
+
+## Quick Start
+
+### Installation
+
+Install all packages by executing:
+
+```bash
+composer require squidit/data-array-mapper
+```
+
+### Requirements
+
+- PHP 8.2-8.5
 
 ### Example data set & end result
 ```php
