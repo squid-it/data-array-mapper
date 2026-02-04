@@ -230,7 +230,7 @@ class Mapper
      * removePivotKeyValues
      *
      * removes pivot point identifier values from the result set.
-     * when converting array to json object this prevents arrays from being transformed to objects.
+     * when converting array to JSON object this prevents arrays from being transformed to objects.
      *
      * $mappedArray = [
      *    3 => [

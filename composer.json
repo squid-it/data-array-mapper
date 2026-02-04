@@ -36,7 +36,7 @@
     "squidit/php-coding-standards": "^2.0",
     "friendsofphp/php-cs-fixer": "^3.57",
     "phpstan/phpstan": "^2.0",
-    "phpunit/phpunit": "^11.1"
+    "phpunit/phpunit": "^11.5"
   },
   "scripts": {
     "check": "phpstan analyse -l 8 src tests",

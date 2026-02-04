@@ -15,12 +15,13 @@ jobs:
           - "8.2"
           - "8.3"
           - "8.4"
+          - "8.5"
         operating-system:
           - "ubuntu-latest"
 
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@v4"
+        uses: "actions/checkout@v6"
 
       - name: "Install PHP"
         uses: "shivammathur/setup-php@v2"
